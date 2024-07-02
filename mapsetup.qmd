@@ -24,3 +24,10 @@ library(patchwork)
 
 cd118 <- congressional_districts(cb = TRUE, resolution = '20m', year = 2022)
 ```
+
+```{r}
+library(readr)
+USA_118th_Congressional_Districts_7321755402533503133 <- read_csv("USA_118th_Congressional_Districts_-7321755402533503133.csv")
+View(USA_118th_Congressional_Districts_7321755402533503133)
+```
+
