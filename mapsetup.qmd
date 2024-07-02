@@ -1,0 +1,26 @@
+```{r}
+library(tidyverse)
+library(tidycensus)
+library(sf)
+library(pals)
+library(biscale)
+library(ggrepel)
+library(tigris)
+options(tigris_use_cache = T)
+library(ggnewscale)
+library(cowplot)
+library(lubridate)
+library(slider)
+library(hrbrthemes)
+library(readxl)
+library(scales)
+library(RColorBrewer)
+library(patchwork)
+
+```
+
+
+```{r, cache=TRU}
+
+cd118 <- congressional_districts(cb = TRUE, resolution = '20m', year = 2022)
+```
