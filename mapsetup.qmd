@@ -110,6 +110,9 @@ ggplot() +
 
 ```
 ```{r}
+#| label: Washington Map
+
+
 ggplot() +
   geom_sf(data = USA |>
             filter(STATEFP == "53")) +
