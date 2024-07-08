@@ -30,4 +30,83 @@ library(readr)
 USA_118th_Congressional_Districts_7321755402533503133 <- read_csv("USA_118th_Congressional_Districts_-7321755402533503133.csv")
 View(USA_118th_Congressional_Districts_7321755402533503133)
 ```
+```{r}
+#| label: load dems and change column
 
+library(readxl)
+T1_ag_dems <- read_excel("T1 ag dems.xlsx")
+View(T1_ag_dems)
+
+
+colnames(T1_ag_dems)[2] <- "Last Name"
+
+
+view(T1_ag_dems)
+
+```
+
+```{r}
+#| label: narrowing the data
+
+dem_districts <- T1_ag_dems |>
+  inner_join(USA_118th_Congressional_Districts_7321755402533503133, by = "Last Name")
+
+dem_districts <- dem_districts |>
+  filter(!(`District ID` %in% c("1308",
+         "5103",
+         "1707",
+         "1707",
+         "4813",
+         "3708")))
+
+colnames(dem_districts)[5] <- "GEOID"
+```
+
+```{r}
+#| label: final data frame
+
+cd118_join <- cd118 |>
+  inner_join(dem_districts, by = "GEOID")
+
+```
+
+```{r, cache=TRUE}
+#| label: neccesarry for maps
+
+USA <- counties(state = NULL, cb = FALSE, resolution = "500k", year = NULL)
+USA_bounds <- st_bbox(USA)
+
+USA <- USA |>
+  filter(!(STATEFP %in% c(60, 66, 78, 72)))
+
+
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = USA) +
+  geom_sf(data = cd118_join, fill = "gainsboro") +
+  theme_minimal() +
+  labs(
+    title = "Counties in New York State",
+    x = "Longitude",
+    y = "Latitude",
+    caption = "Source: Shapefile obtained using the tigris R package, version 2.0.1."
+  ) +
+  theme(plot.caption = element_text(hjust = 1))
+```
+
+ggrepel::geom_label_repel(
+    data = cd118_join,
+    aes(label = 'Representative Name'),
+    min.segment.length = 0, 
+    seed = 1234,
+    force = 20,
+    max.overlaps = Inf,
+    size = 2.75) +
+    
+lims(
+    x = c(USA_bounds$xmin, USA_bounds$xmax),
+    y = c(USA_bounds$ymin, USA_bounds$ymax)) +    
+    
