@@ -16,6 +16,8 @@ library(readxl)
 library(scales)
 library(RColorBrewer)
 library(patchwork)
+install.packages(usmap)
+library(usmap)
 
 ```
 
@@ -70,43 +72,49 @@ cd118_join <- cd118 |>
 
 ```
 
-```{r, cache=TRUE}
+```{r}
 #| label: neccesarry for maps
 
 USA <- counties(state = NULL, cb = FALSE, resolution = "500k", year = NULL)
-USA_bounds <- st_bbox(USA)
+
 
 USA <- USA |>
-  filter(!(STATEFP %in% c(60, 66, 78, 72)))
+  filter(!(STATEFP %in% c("60", "66", "78", "72", "69", "02", "15")))
 
 
+USA_bounds <- st_bbox(USA)
 ```
 
 
 ```{r}
+#| label: full country
+
+
 ggplot() +
   geom_sf(data = USA) +
-  geom_sf(data = cd118_join, fill = "gainsboro") +
+  geom_sf(data = cd118_join, fill = "red") +
   theme_minimal() +
-  labs(
-    title = "Counties in New York State",
-    x = "Longitude",
-    y = "Latitude",
-    caption = "Source: Shapefile obtained using the tigris R package, version 2.0.1."
-  ) +
-  theme(plot.caption = element_text(hjust = 1))
+  lims(
+    x = c(USA_bounds$xmin, USA_bounds$xmax),
+    y = c(USA_bounds$ymin, USA_bounds$ymax)) 
+```
+```{r}
+#| label: CT Map
+
+ggplot() +
+  geom_sf(data = USA |>
+            filter(STATEFP == "09")) +
+  geom_sf(data = cd118_join |>
+            filter(STATEFP == "09"), linewidth = 2) +
+  theme_minimal()
+
+```
+```{r}
+ggplot() +
+  geom_sf(data = USA |>
+            filter(STATEFP == "53")) +
+  geom_sf(data = cd118_join |>
+            filter(STATEFP == "53"), fill = "red", linewidth = 2) +
+  theme_minimal()
 ```
 
-ggrepel::geom_label_repel(
-    data = cd118_join,
-    aes(label = 'Representative Name'),
-    min.segment.length = 0, 
-    seed = 1234,
-    force = 20,
-    max.overlaps = Inf,
-    size = 2.75) +
-    
-lims(
-    x = c(USA_bounds$xmin, USA_bounds$xmax),
-    y = c(USA_bounds$ymin, USA_bounds$ymax)) +    
-    
