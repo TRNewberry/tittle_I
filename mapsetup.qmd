@@ -121,3 +121,96 @@ ggplot() +
   theme_minimal()
 ```
 
+
+```{r}
+install.packages("usmap")
+library(usmap) #import the package
+library(ggplot2) #use ggplot2 to add layer for visualization
+```
+```{r}
+
+us_states <- tigris::states(class = "sf")
+
+us_states <- us_states |>
+  filter(!(STATEFP %in% c("60", "66", "78", "72", "69", "02", "15")))
+
+
+GT_states <- us_states |>
+  right_join(Chairman_Thompson_Travel_2021_2023, by = "NAME")
+
+colnames(Chairman_Thompson_Travel_2021_2023)[6] <- "NAME"
+
+GT_states <- GT_states |>
+  mutate(INTPTLAT = gsub("\\+", "", INTPTLAT),
+         INTPTLON = gsub("\\-0", "-", INTPTLON)) |>
+  mutate(INTPTLON = as.numeric(INTPTLON),
+         INTPTLAT = as.numeric(INTPTLAT))
+
+
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = us_states, fill = "#4B6D34", color = "white") +
+  ggrepel::geom_label_repel(
+    data = GT_states,
+    aes(label = NAME, x = INTPTLON, y = INTPTLAT),
+    box.padding = 0.5,
+    segment.color = "black",
+    segment.size = 0.2,
+    seed = 1234,
+    force = 20,
+     box.color = "#FFFFFF",
+    color = "black",
+    fill = "lightyellow",
+    max.overlaps = Inf  # Allow unlimited overlaps for labeling
+  ) +
+  labs(
+    title = "States Chairman Thompson Visited",
+    subtitle = "Since Becoming Republican Leader of the Committee",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal() +  # Use minimal theme for clean appearance
+  theme(
+    plot.title = element_text(size = 28, face = "bold", hjust = 0.5, family = "Serif"),  # Larger title
+    plot.subtitle = element_text(size = 18, hjust = 0.5),  # Smaller subtitle
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = "#FFFFFF"),  # Light gray background
+    axis.text = element_blank(),  # Hide axis text
+    axis.ticks = element_blank(),  # Hide axis ticks
+    legend.position = "none"  # Remove legend
+  )
+```
+
+
+
+
+
+```{r}
+ggplot() +
+  geom_sf(data = us_states) +
+  ggrepel::geom_label_repel(
+    data = GT_states,
+    aes(label = NAME, x = INTPTLON, y = INTPTLAT),
+     min.segment.length = 0, 
+    seed = 1234,
+    force = 20,
+     max.overlaps = Inf) +
+  theme_void() + 
+  labs(
+    title = "States Chairman Thompson Visited",
+    subtitle = "since becoming Republican leader of the Committee",
+    x = " " ,
+    y = " ")
+
+```
+```{r}
+
+
+
+
+
+
+
