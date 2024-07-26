@@ -134,11 +134,10 @@ us_states <- tigris::states(class = "sf")
 us_states <- us_states |>
   filter(!(STATEFP %in% c("60", "66", "78", "72", "69", "02", "15")))
 
+colnames(Chairman_Thompson_Travel_2021_2023)[6] <- "NAME"
 
 GT_states <- us_states |>
   right_join(Chairman_Thompson_Travel_2021_2023, by = "NAME")
-
-colnames(Chairman_Thompson_Travel_2021_2023)[6] <- "NAME"
 
 GT_states <- GT_states |>
   mutate(INTPTLAT = gsub("\\+", "", INTPTLAT),
@@ -148,7 +147,14 @@ GT_states <- GT_states |>
 
 
 ```
-
+geom_sf(data = us_states) +
+  ggrepel::geom_label_repel(
+    data = GT_states,
+    aes(label = NAME, x = INTPTLON, y = INTPTLAT),
+     min.segment.length = 0, 
+    seed = 1234,
+    force = 20,
+     max.overlaps = Inf)
 
 ```{r}
 ggplot() +
@@ -156,11 +162,10 @@ ggplot() +
   ggrepel::geom_label_repel(
     data = GT_states,
     aes(label = NAME, x = INTPTLON, y = INTPTLAT),
-    box.padding = 0.35,
     segment.color = "black",
-    segment.size = 0.2,
     seed = 1234,
-    force = 8,
+    min.segment.length = 0.2,
+    force = 20,
     color = "black",
     fill = "lightyellow",
     max.overlaps = Inf  # Allow unlimited overlaps for labeling
